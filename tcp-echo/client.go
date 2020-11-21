@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"flag"
 	"log"
 	"net"
+	"os"
+	"strings"
 )
 
 func main() {
@@ -19,18 +22,23 @@ func main() {
 		log.Panic(err)
 	}
 
+	readline := bufio.NewReader(os.Stdin)
+
 	for {
 		fmt.Print("Please input: ")
-		var input string
-		fmt.Scanln(&input)
-		log.Println("debug: ", input)
+		input, err := readline.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if err != nil {
+			return
+		}
 		if input == "quit" {
 			break
 		}
-		_, err := conn.Write([]byte(input))
+		nw, err := conn.Write([]byte(input))
 		if err != nil {
 			log.Panic(err)
 		}
+		log.Printf("Sent %d bytes\n", nw)
 		buf := make([]byte, 1024)
 		nr, err := conn.Read(buf)
 		if err != nil {

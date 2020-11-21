@@ -43,8 +43,10 @@ func handleRequest(conn net.Conn) {
 		}
 		data := buf[:nr]
 		log.Printf("Received data: %s", data)
-		if _, err := conn.Write(data); err != nil {
+		nw, err := conn.Write(data)
+		if err != nil {
 			return
 		}
+		log.Printf("Reply %d bytes", nw)
 	}
 }
