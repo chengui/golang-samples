@@ -1,27 +1,32 @@
-package main
+package client
 
 import (
 	"bufio"
 	"fmt"
-	"flag"
 	"log"
 	"net"
 	"os"
 	"strings"
 )
 
-func main() {
-	host := flag.String("host", "127.0.0.1", "server ip")
-	port := flag.Int("port", 8080, "server port")
+type EchoClient struct {
+	Host string
+	Port int
+}
 
-	flag.Parse()
+func NewEchoClient(host string, port int) *EchoClient {
+	return &EchoClient{
+		Host: host,
+		Port: port,
+	}
+}
 
-	addr := fmt.Sprintf("%s:%d", *host, *port)
+func (c *EchoClient) Start() error {
+	addr := fmt.Sprintf("%s:%d", c.Host, c.Port)
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
-
 	readline := bufio.NewReader(os.Stdin)
 
 	for {
@@ -29,22 +34,23 @@ func main() {
 		input, err := readline.ReadString('\n')
 		input = strings.TrimSpace(input)
 		if err != nil {
-			return
+			return err
 		}
 		if input == "quit" {
 			break
 		}
 		nw, err := conn.Write([]byte(input))
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 		log.Printf("Sent %d bytes\n", nw)
 		buf := make([]byte, 1024)
 		nr, err := conn.Read(buf)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 		data := buf[:nr]
 		fmt.Printf("Received: %s\n", data)
 	}
+	return nil
 }

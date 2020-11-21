@@ -1,36 +1,43 @@
-package main
+package server
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net"
 )
 
-func main() {
-	host := flag.String("host", "127.0.0.1", "address to bind")
-	port := flag.Int("port", 8080, "port to listen")
+type EchoServer struct {
+	Host string
+	Port int
+}
 
-	flag.Parse()
+func NewEchoServer(host string, port int) *EchoServer {
+	return &EchoServer{
+		Host: host,
+		Port: port,
+	}
+}
 
-	addr := fmt.Sprintf("%s:%d", *host, *port)
+func (s *EchoServer) Start() error {
+	addr := fmt.Sprintf("%s:%d", s.Host, s.Port)
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer listen.Close()
-	log.Printf("Listen at %s:%d...", *host, *port)
+	log.Printf("Listen at %s...", addr)
 
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
-		go handleRequest(conn)
+		go s.Handler(conn)
 	}
+	return nil
 }
 
-func handleRequest(conn net.Conn) {
+func (s *EchoServer) Handler(conn net.Conn) error {
 	log.Printf("Connection established.")
 	defer conn.Close()
 	defer log.Printf("Connection closed.")
@@ -39,14 +46,15 @@ func handleRequest(conn net.Conn) {
 		buf := make([]byte, 1024)
 		nr, err := conn.Read(buf)
 		if err != nil {
-			return
+			return err
 		}
 		data := buf[:nr]
 		log.Printf("Received data: %s", data)
 		nw, err := conn.Write(data)
 		if err != nil {
-			return
+			return err
 		}
 		log.Printf("Reply %d bytes", nw)
 	}
+	return nil
 }
