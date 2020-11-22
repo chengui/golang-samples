@@ -6,67 +6,66 @@ import (
 )
 
 type Node struct {
-	Key string
-	Value string
+	Key interface{}
+	Val interface{}
 }
 
 type LRUCache struct {
-	Index map[string]*list.Element
+	Index map[interface{}]*list.Element
 	Cache *list.List
 	Size int
 }
 
 func NewLRUCache(size int) *LRUCache {
+	index := make(map[interface{}]*list.Element)
 	cache := list.New()
-	index := make(map[string]*list.Element, size)
 	return &LRUCache{
-		Cache: cache,
 		Index: index,
+		Cache: cache,
 		Size: size,
 	}
 }
 
-func (c *LRUCache) Get(key string) (string, error) {
+func (c *LRUCache) Get(key interface{}) (interface{}, bool) {
 	idx, ok := c.Index[key]
-	if ok != true {
-		return "", fmt.Errorf("item not found")
+	if ok == false {
+		return nil, false
 	}
 	c.Cache.MoveToFront(idx)
-	elem := c.Cache.Front()
-	node := elem.Value.(Node)
-	return node.Value, nil
+	node := idx.Value.(Node)
+	return node.Val, true
 }
 
-func (c *LRUCache) Set(key string, val string) error {
+func (c *LRUCache) Set(key interface{}, val interface{}) error {
 	idx, ok := c.Index[key]
 	if ok {
-		node := idx.Value.(Node)
-		node.Value = val
 		c.Cache.MoveToFront(idx)
+		node := idx.Value.(Node)
+		node.Val = val
 		return nil
 	}
 	if len(c.Index) >= c.Size {
 		idel := c.Cache.Back()
 		node := idel.Value.(Node)
-		kdel := node.Key
+		delete(c.Index, node.Key)
 		c.Cache.Remove(idel)
-		delete(c.Index, kdel)
 	}
 	node := Node{
 		Key: key,
-		Value: val,
+		Val: val,
 	}
 	c.Index[key] = c.Cache.PushFront(node)
 	return nil
 }
 
-func (c *LRUCache) Delete(key string) error {
+func (c *LRUCache) Delete(key interface{}) (interface{}, error) {
 	idx, ok := c.Index[key]
-	if ok != true {
-		return fmt.Errorf("item not found")
+	if ok == false {
+		return nil, fmt.Errorf("item not found")
 	}
 	c.Cache.Remove(idx)
-	return nil
+	node := idx.Value.(Node)
+	return node.Val, nil
 }
 
 func (c *LRUCache) Len() int {
