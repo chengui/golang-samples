@@ -1,13 +1,12 @@
 package cache
 
 import (
-	"fmt"
 	"time"
 )
 
 type Entry struct {
 	Val interface{}
-	TTL int
+	Exp int64
 }
 
 type TTLCache struct {
@@ -33,21 +32,24 @@ func (c *TTLCache) Get(key interface{}) (interface{}, bool) {
 }
 
 func (c *TTLCache) Set(key interface{}, val interface{}) error {
-	c.Cache[key] = &Entry{Val: val, TTL: 0}
+	c.Cache[key] = &Entry{
+		Val: val,
+		Exp: time.Now().Unix() + int64(c.TTL),
+	}
 	return nil
 }
 
 func (c *TTLCache) Delete(key interface{}) error {
+	delete(c.Cache, key)
 	return nil
 }
 
 func (c *TTLCache) clean() {
 	tick := time.Tick(time.Second)
 	for range tick {
+		now := time.Now().Unix()
 		for k, v := range c.Cache {
-			v.TTL += 1
-			fmt.Println("clean: ", v, v.TTL >= c.TTL)
-			if v.TTL >= c.TTL {
+			if v.Exp <= now {
 				delete(c.Cache, k)
 			}
 		}
