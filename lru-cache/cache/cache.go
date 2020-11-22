@@ -32,7 +32,7 @@ func (c *LRUCache) Get(key interface{}) (interface{}, bool) {
 		return nil, false
 	}
 	c.Cache.MoveToFront(idx)
-	node := idx.Value.(Node)
+	node := idx.Value.(*Node)
 	return node.Val, true
 }
 
@@ -40,17 +40,17 @@ func (c *LRUCache) Set(key interface{}, val interface{}) error {
 	idx, ok := c.Index[key]
 	if ok {
 		c.Cache.MoveToFront(idx)
-		node := idx.Value.(Node)
+		node := idx.Value.(*Node)
 		node.Val = val
 		return nil
 	}
 	if len(c.Index) >= c.Size {
 		idel := c.Cache.Back()
-		node := idel.Value.(Node)
+		node := idel.Value.(*Node)
 		delete(c.Index, node.Key)
 		c.Cache.Remove(idel)
 	}
-	node := Node{
+	node := &Node{
 		Key: key,
 		Val: val,
 	}
@@ -64,7 +64,7 @@ func (c *LRUCache) Delete(key interface{}) (interface{}, error) {
 		return nil, fmt.Errorf("item not found")
 	}
 	c.Cache.Remove(idx)
-	node := idx.Value.(Node)
+	node := idx.Value.(*Node)
 	return node.Val, nil
 }
 
