@@ -20,9 +20,16 @@ func main() {
 
 	srv := gin.Default()
 	srv.GET("/uuid", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"uuid": uuidGen.Generate(),
-		})
+		uid, err := uuidGen.Generate()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"uuid": uid,
+			})
+		}
 	})
 	srv.Run(":8001")
 }

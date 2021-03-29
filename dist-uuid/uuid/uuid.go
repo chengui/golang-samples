@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 	"strconv"
 	"time"
@@ -40,9 +41,15 @@ func NewUUID(opts *Options) *UUID {
 	}
 }
 
-func (u *UUID) Generate() uint64 {
-	ID, _ := u.Flaker.NextID()
-	return ID
+func (u *UUID) Generate() (uint64, error) {
+	if u.Flaker == nil {
+		return 0, fmt.Errorf("Failed to initialize")
+	}
+	ID, err := u.Flaker.NextID()
+	if err != nil {
+		return 0, err
+	}
+	return ID, nil
 }
 
 type Assigner struct {
@@ -77,6 +84,9 @@ func (a *Assigner) GetMachineID() (uint16, error) {
 }
 
 func (a *Assigner) CheckMachinID(machineID uint16) bool {
+	if a.ExistsFile() {
+		return true
+	}
 	res, err := a.AddToRedisSet(machineID)
 	if err != nil || res == 0 {
 		return false
@@ -105,6 +115,20 @@ func (a *Assigner) WriteToFile(machineID uint16) error {
 	idStr := strconv.FormatInt(int64(machineID), 10)
 	err := ioutil.WriteFile(a.LocalFile, []byte(idStr), 0666)
 	return err
+}
+
+func (a *Assigner) ExistsFile() bool {
+	_, err := os.Stat(a.LocalFile)
+	if err != nil {
+		if os.IsExist(err) {
+			return true
+		}
+		if os.IsNotExist(err) {
+			return false
+		}
+		return false
+	}
+	return true
 }
 
 func (a *Assigner) AddToRedisSet(machineID uint16) (int64, error) {
