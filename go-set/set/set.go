@@ -27,6 +27,14 @@ func (s *Set) Contains(key interface{}) bool {
 	return ok
 }
 
+func (s *Set) Range(f func(k interface{}) bool) {
+	for k, _ := range s.Map {
+		if !f(k) {
+			break
+		}
+	}
+}
+
 func (s *Set) String() string {
 	a := make([]string, 0)
 	for k := range s.Map {

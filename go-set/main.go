@@ -14,4 +14,9 @@ func main() {
 	fmt.Println("set:", set.String())
 	set.Remove("a")
 	fmt.Println("set:", set.String())
+	set.Add("c")
+	set.Range(func(k interface{}) bool {
+		fmt.Println(k)
+		return true
+	})
 }
