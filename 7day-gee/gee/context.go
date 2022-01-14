@@ -64,6 +64,10 @@ func (c *Context) EnsureBody(item interface{}) bool {
 		c.Fail(400, err)
 		return false
 	}
+	if err := Validate(item); err != nil {
+		c.Fail(400, err)
+		return false
+	}
 	return true
 }
 
