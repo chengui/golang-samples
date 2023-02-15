@@ -7,20 +7,33 @@ import (
     "net/http"
     "os"
     "strings"
+    "time"
 )
 
 func main() {
-    for _, url := range os.Args[1:] {
-        if !strings.HasPrefix(url, "http://") {
-            url = "http://" + url
+    if false {
+        for _, url := range os.Args[1:] {
+            if err := fetch2(url); err != nil {
+                os.Exit(1)
+            }
         }
-        if err := fetch2(url); err != nil {
-            os.Exit(1)
+    } else {
+        start := time.Now()
+        ch := make(chan string)
+        for _, url := range os.Args[1:] {
+            go fetch3(url, ch)
         }
+        for range os.Args[1:] {
+            fmt.Println(<-ch)
+        }
+        fmt.Printf("%.2fs elapsed.\n", time.Since(start).Seconds())
     }
 }
 
 func fetch1(url string) error {
+    if !strings.HasPrefix(url, "http://") {
+        url = "http://" + url
+    }
     resp, err := http.Get(url)
     if err != nil {
         fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -38,6 +51,9 @@ func fetch1(url string) error {
 }
 
 func fetch2(url string) error {
+    if !strings.HasPrefix(url, "http://") {
+        url = "http://" + url
+    }
     resp, err := http.Get(url)
     if err != nil {
         fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -45,9 +61,29 @@ func fetch2(url string) error {
     }
     fmt.Printf("Status: %v\n", resp.Status)
     _, err = io.Copy(os.Stdout, resp.Body)
+    resp.Body.Close()
     if err != nil {
         fmt.Fprintf(os.Stderr, "error: %v\n", err)
         return err
     }
     return nil
+}
+
+func fetch3(url string, ch chan<- string) {
+    start := time.Now()
+    if !strings.HasPrefix(url, "http://") {
+        url = "http://" + url
+    }
+    resp, err := http.Get(url)
+    if err != nil {
+        ch<- fmt.Sprint(err)
+        return
+    }
+    nbytes, err := io.Copy(ioutil.Discard, resp.Body)
+    resp.Body.Close()
+    if err != nil {
+        ch<- fmt.Sprint(err)
+        return
+    }
+    ch<- fmt.Sprintf("%.2fs %7d %s", time.Since(start).Seconds(), nbytes, url)
 }
