@@ -29,6 +29,39 @@ func Outline(node *html.Node) string {
 	var depth int
 	buf := &bytes.Buffer{}
 	startElement := func(node *html.Node) {
+		if node.Type == html.ElementNode {
+			buf.WriteString(fmt.Sprintf("%*s<%s>\n", depth*2, "", node.Data))
+			depth++
+
+		}
+	}
+	endElement := func(node *html.Node) {
+		if node.Type == html.ElementNode {
+			depth--
+			buf.WriteString(fmt.Sprintf("%*s</%s>\n", depth*2, "", node.Data))
+
+		}
+	}
+	var visit func(_ *html.Node, _1, _2 func(*html.Node))
+	visit = func(node *html.Node, pre, post func(*html.Node)) {
+		if pre != nil {
+			pre(node)
+		}
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			visit(c, pre, post)
+		}
+		if post != nil {
+			post(node)
+		}
+	}
+	visit(node, startElement, endElement)
+	return buf.String()
+}
+
+func Format(node *html.Node) string {
+	var depth int
+	buf := &bytes.Buffer{}
+	startElement := func(node *html.Node) {
 		if node.Type == html.ElementNode || node.Type == html.TextNode || node.Type == html.CommentNode {
 			if node.Type == html.ElementNode {
 				var attrs []string
