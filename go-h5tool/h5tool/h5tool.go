@@ -93,7 +93,8 @@ func FindTexts(url string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	find := func(texts []string, node *html.Node) []string {
+	var visit func([]string, *html.Node) []string
+	visit = func(texts []string, node *html.Node) []string {
 		if node.Type == html.ElementNode && (node.Data == "script" || node.Data == "style") {
 			return texts
 		}
@@ -103,7 +104,10 @@ func FindTexts(url string) ([]string, error) {
 				texts = append(texts, text)
 			}
 		}
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			texts = visit(texts, c)
+		}
 		return texts
 	}
-	return visit(nil, doc, find), nil
+	return visit(nil, doc), nil
 }
