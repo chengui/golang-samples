@@ -58,7 +58,7 @@ func Outline(node *html.Node) string {
 	return buf.String()
 }
 
-func Format(node *html.Node) string {
+func Full(node *html.Node) string {
 	var depth int
 	buf := &bytes.Buffer{}
 	startElement := func(node *html.Node) {
