@@ -13,7 +13,7 @@ type BitSet struct {
 	bits []uint8
 }
 
-func NewBitSet() *BitSet {
+func New() *BitSet {
 	return &BitSet{}
 }
 

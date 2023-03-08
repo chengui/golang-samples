@@ -37,7 +37,7 @@ func TestSymmetricDifference(t *testing.T) {
 
 // -------- Examples ----------
 func ExampleBitSet_Add() {
-	x := NewBitSet()
+	x := New()
 	x.Add(1)
 	x.Add(9)
 	x.Add(143)
@@ -54,7 +54,7 @@ func ExampleBitSet_Add() {
 }
 
 func ExampleBitSet_Copy() {
-	x := NewBitSet()
+	x := New()
 	x.Add(1)
 	x.Add(9)
 	y := x.Copy()
@@ -64,7 +64,7 @@ func ExampleBitSet_Copy() {
 }
 
 func ExampleBitSet_AddAll() {
-	x := NewBitSet()
+	x := New()
 	x.AddAll(9, 42)
 	fmt.Printf("len(x)=%d\n", x.Len())
 	fmt.Println("x:", x.String())
@@ -78,7 +78,7 @@ func ExampleBitSet_AddAll() {
 }
 
 func ExampleBitSet() {
-	x, y := NewBitSet(), NewBitSet()
+	x, y := New(), New()
 	x.AddAll(1, 2)
 	y.AddAll(1, 3)
 
