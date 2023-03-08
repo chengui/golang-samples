@@ -1,10 +1,10 @@
-package wav
+package wave
 
 import (
-	"io"
-	"fmt"
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"io"
 )
 
 type WavReader struct {

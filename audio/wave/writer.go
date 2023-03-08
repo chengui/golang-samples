@@ -1,4 +1,4 @@
-package wav
+package wave
 
 import (
 	"encoding/binary"
@@ -32,7 +32,7 @@ func NewWavWriter(writer io.Writer, format *WavFormat, numSamples int) *WavWrite
 func (w *WavWriter) WriteRIFF() error {
 	dataSize := w.samples * uint32(w.format.BlockAlign)
 	binary.Write(w.writer, binary.BigEndian, []byte("RIFF"))
-	binary.Write(w.writer, binary.LittleEndian, uint32(36 + dataSize))
+	binary.Write(w.writer, binary.LittleEndian, uint32(36+dataSize))
 	binary.Write(w.writer, binary.BigEndian, []byte("WAVE"))
 	return nil
 }
