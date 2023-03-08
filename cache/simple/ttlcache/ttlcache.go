@@ -1,4 +1,4 @@
-package cache
+package ttlcache
 
 import (
 	"time"
@@ -11,13 +11,13 @@ type Entry struct {
 
 type TTLCache struct {
 	Cache map[interface{}]*Entry
-	TTL int
+	TTL   int
 }
 
-func NewTTLCache(ttl int) *TTLCache {
+func New(ttl int) *TTLCache {
 	cache := TTLCache{
 		Cache: make(map[interface{}]*Entry),
-		TTL: ttl,
+		TTL:   ttl,
 	}
 	go cache.clean()
 	return &cache

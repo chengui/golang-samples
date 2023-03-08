@@ -1,12 +1,11 @@
-package main
+package lrucache
 
 import (
 	"fmt"
-	lrucache "lru-cache/cache"
 )
 
-func main() {
-	cache := lrucache.NewLRUCache(3)
+func Example() {
+	cache := New(3)
 	cache.Set("aa", "aa")
 	cache.Set("bb", "bb")
 	cache.Set("cc", "cc")
@@ -17,4 +16,6 @@ func main() {
 	fmt.Println("cache:bb=", v2, ok)
 	v3, ok := cache.Get("cc")
 	fmt.Println("cache:cc=", v3, ok)
+	// Output:
+	//
 }

@@ -1,8 +1,8 @@
-package cache
+package lrucache
 
 import (
-	"fmt"
 	"container/list"
+	"fmt"
 )
 
 type Node struct {
@@ -13,22 +13,22 @@ type Node struct {
 type LRUCache struct {
 	Index map[interface{}]*list.Element
 	Cache *list.List
-	Size int
+	Size  int
 }
 
-func NewLRUCache(size int) *LRUCache {
+func New(size int) *LRUCache {
 	index := make(map[interface{}]*list.Element)
 	cache := list.New()
 	return &LRUCache{
 		Index: index,
 		Cache: cache,
-		Size: size,
+		Size:  size,
 	}
 }
 
 func (c *LRUCache) Get(key interface{}) (interface{}, bool) {
 	idx, ok := c.Index[key]
-	if ok == false {
+	if !ok {
 		return nil, false
 	}
 	c.Cache.MoveToFront(idx)
@@ -60,7 +60,7 @@ func (c *LRUCache) Set(key interface{}, val interface{}) error {
 
 func (c *LRUCache) Delete(key interface{}) (interface{}, error) {
 	idx, ok := c.Index[key]
-	if ok == false {
+	if !ok {
 		return nil, fmt.Errorf("item not found")
 	}
 	c.Cache.Remove(idx)
