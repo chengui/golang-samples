@@ -1,4 +1,4 @@
-package handler
+package shorturl
 
 import (
 	"crypto/md5"
