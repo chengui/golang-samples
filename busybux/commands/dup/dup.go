@@ -1,18 +1,19 @@
 package main
 
 import (
-    "bufio"
-    "fmt"
-    "io/ioutil"
-    "strings"
-    "os"
+	"bufio"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"strings"
 )
 
-func main() {
-    dup2(os.Args[1:])
+func Main(w io.Writer, args []string) {
+    dup2(w, args)
 }
 
-func dup1(files []string) {
+func dup1(w io.Writer, files []string) {
     countLines := func(file *os.File, counts map[string]int) {
         scanner := bufio.NewScanner(file)
         for scanner.Scan() {
@@ -20,27 +21,23 @@ func dup1(files []string) {
         }
     }
     counts := make(map[string]int)
-    if len(files) == 0 {
-        countLines(os.Stdin, counts)
-    } else {
         for _, arg := range files {
             f, err := os.Open(arg)
             if err != nil {
-                fmt.Fprintf(os.Stderr, "dup: %v\n", err)
+                fmt.Fprintf(w, "dup: %v\n", err)
                 continue
             }
             countLines(f, counts)
             f.Close()
         }
-    }
     for line, count := range counts {
         if count > 1 {
-            fmt.Printf("%d\t%q\n", count, line)
+            fmt.Fprintf(w, "%d\t%q\n", count, line)
         }
     }
 }
 
-func dup2(files []string) {
+func dup2(w io.Writer, files []string) {
     counts := make(map[string]int)
     if len(files) == 0 {
         scanner := bufio.NewScanner(os.Stdin)
@@ -51,7 +48,7 @@ func dup2(files []string) {
         for _, file := range files {
             data, err := ioutil.ReadFile(file)
             if err != nil {
-                fmt.Fprintf(os.Stderr, "dup: %v\n", err)
+                fmt.Fprintf(w, "dup: %v\n", err)
                 continue
             }
             for _, line := range strings.Split(string(data), "\n") {
@@ -61,7 +58,7 @@ func dup2(files []string) {
     }
     for line, count := range counts {
         if count > 1 {
-            fmt.Printf("%d\t%q\n", count, line)
+            fmt.Fprintf(w, "%d\t%q\n", count, line)
         }
     }
 }

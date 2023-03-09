@@ -8,6 +8,13 @@ import (
     "unicode/utf8"
 )
 
+func Main(w io.Writer, args []string) {
+    for _, arg := range args {
+        f, _ := os.Open(arg)
+        CountWord(w, f)
+    }
+}
+
 func CountRune(rd io.Reader) {
     countLetters, countNumbers := 0, 0
     countInvalid, countLines := 0, 0
@@ -53,7 +60,7 @@ func CountRune(rd io.Reader) {
     }
 }
 
-func CountWord(rd io.Reader) {
+func CountWord(w io.Writer, rd io.Reader) {
     countWords := make(map[string]int)
     scanner := bufio.NewScanner(rd)
     scanner.Split(bufio.ScanWords)
@@ -63,6 +70,6 @@ func CountWord(rd io.Reader) {
     }
     fmt.Printf("word\tcnt\n")
     for c, n := range countWords {
-        fmt.Printf("%q\t%d\n", c, n)
+        fmt.Fprintf(w, "%q\t%d\n", c, n)
     }
 }
