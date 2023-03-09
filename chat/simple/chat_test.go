@@ -1,15 +1,13 @@
-package main
+package simple
 
 import (
 	"log"
 	"net/http"
-
-	"chat-room/chat"
 )
 
-func main() {
+func Example() {
 	addr := ":8000"
-	handler := chat.NewHandler()
+	handler := NewHandler()
 	http.HandleFunc("/", handler.Serve)
 	http.HandleFunc("/chat", handler.HandleChat)
 	log.Printf("Start server at %v", addr)
