@@ -1,9 +1,10 @@
-package commands
+package builtins
 
 import (
-	"busybux/commands/dup"
-	"busybux/commands/echo"
-	"busybux/commands/wc"
+	"busybux/builtins/cat"
+	"busybux/builtins/dup"
+	"busybux/builtins/echo"
+	"busybux/builtins/wc"
 	"io"
 )
 
@@ -13,9 +14,11 @@ type Handler func(io.Writer, []string) error
 
 func init() {
 	Commands = map[string]Handler{
-		"dup":  dup.Main,
 		"echo": echo.Main,
-		"wc":   wc.Main,
+		"cat":  cat.Main,
+
+		"dup": dup.Main,
+		"wc":  wc.Main,
 	}
 
 }
