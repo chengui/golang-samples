@@ -1,6 +1,7 @@
 package cat
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io"
@@ -21,53 +22,40 @@ func Main(w io.Writer, args []string) error {
 		return nil
 	}
 
-	return cat(w, flagSet.Args())
-}
-
-type reader struct {
-	io.Reader
-	cnt int
-}
-
-func (in *reader) Read(p []byte) (int, error) {
-	if numberFlag {
-		l, err := in.ReadBytes('\n')
-		if err != nil && err != io.EOF || len(l) == 0 {
-			return copy(p, l), err
-		}
-		in.cnt++
-		s := []byte(fmt.Sprintf("%d ", in.cnt))
-		s = append(s, l...)
-		return copy(p, s), err
-	} else {
-		return in.Reader.Read(p)
-	}
-}
-
-func (in *reader) ReadBytes(delim byte) (s []byte, err error) {
-	b := make([]byte, 1)
-	for {
-		_, err = in.Reader.Read(b)
-		if err != nil {
-			return
-		}
-		s = append(s, b...)
-		if b[0] == '\n' {
-			return
-		}
-	}
-}
-
-func cat(w io.Writer, args []string) error {
-	for _, arg := range args {
+	for _, arg := range flag.Args() {
 		f, err := os.Open(os.ExpandEnv(arg))
 		if err != nil {
-			fmt.Printf("cat: %v\n", err)
+			fmt.Fprintf(w, "cat: %v\n", err)
 			continue
 		}
 		defer f.Close()
-		rd := &reader{f, 0}
-		if _, err := io.Copy(w, rd); err != nil {
+		if err := cat(w, f); err != nil {
+			fmt.Fprintf(w, "cat: %v\n", err)
+		}
+	}
+	return nil
+}
+
+func cat(w io.Writer, r io.Reader) error {
+	if numberFlag {
+		cnt := 1
+		rd := bufio.NewReader(r)
+		for {
+			line, err := rd.ReadString('\n')
+			if err == io.EOF {
+				if len(line) > 0 {
+					fmt.Fprintf(w, "%d %s", cnt, line)
+				}
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(w, "%d %s", cnt, line)
+			cnt++
+		}
+	} else {
+		if _, err := io.Copy(w, r); err != nil {
 			return err
 		}
 	}
