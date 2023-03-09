@@ -16,9 +16,8 @@ func init() {
 	Commands = map[string]Handler{
 		"echo": echo.Main,
 		"cat":  cat.Main,
-
-		"dup": dup.Main,
-		"wc":  wc.Main,
+		"dup":  dup.Main,
+		"wc":   wc.Main,
 	}
 
 }
