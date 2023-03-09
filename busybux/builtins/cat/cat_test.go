@@ -20,7 +20,7 @@ func TestCat(t *testing.T) {
 	files := []struct {
 		name, content string
 	}{
-		{"hello_nl.txt", "hello world\nhello world 2\n"},
+		{"hello_nl.txt", "hello world\n\nhello world 2\n"},
 		{"hello_nonl.txt", "hello world\nhello world 2"},
 	}
 	for _, file := range files {
@@ -36,12 +36,12 @@ func TestCat(t *testing.T) {
 		{
 			true,
 			[]string{"hello_nl.txt"},
-			"1 hello world\n2 hello world 2\n",
+			"1 hello world\n2 \n3 hello world 2\n",
 		},
 		{
 			false,
 			[]string{"hello_nl.txt"},
-			"hello world\nhello world 2\n",
+			"hello world\n\nhello world 2\n",
 		},
 		{
 			true,

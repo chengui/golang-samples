@@ -35,6 +35,7 @@ func (in *reader) Read(p []byte) (int, error) {
 		if err != nil && err != io.EOF || len(l) == 0 {
 			return copy(p, l), err
 		}
+		in.cnt++
 		s := []byte(fmt.Sprintf("%d ", in.cnt))
 		s = append(s, l...)
 		return copy(p, s), err
@@ -44,19 +45,14 @@ func (in *reader) Read(p []byte) (int, error) {
 }
 
 func (in *reader) ReadBytes(delim byte) (s []byte, err error) {
-	s, b := make([]byte, 0), make([]byte, 1)
+	b := make([]byte, 1)
 	for {
 		_, err = in.Reader.Read(b)
-		if err == io.EOF {
-			in.cnt++
-			return
-		}
 		if err != nil {
 			return
 		}
 		s = append(s, b...)
 		if b[0] == '\n' {
-			in.cnt++
 			return
 		}
 	}
