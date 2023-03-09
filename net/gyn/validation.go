@@ -1,4 +1,4 @@
-package gee
+package gyn
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ func Validate(o interface{}) (err error) {
 	}
 	for i := 0; i < typ.NumField(); i++ {
 		field := typ.Field(i)
-		if strings.Index(field.Tag.Get("binding"), "required") > -1 {
+		if strings.Contains(field.Tag.Get("binding"), "required") {
 			fval := val.Field(i).Interface()
 			zero := reflect.Zero(field.Type).Interface()
 			if reflect.DeepEqual(zero, fval) {
