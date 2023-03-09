@@ -5,16 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"cgo-engine/wrapper"
 )
 
-func main() {
-	var options = flag.String("options", "", "engine options")
-	var resource = flag.String("resource", "", "resource file")
-
-	flag.Parse()
-
+func ExampleEngine() {
 	res := wrapper.NewEngineResource(*resource)
 	defer res.Delete()
 

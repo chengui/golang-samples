@@ -1,4 +1,4 @@
-package main
+package engine
 
 import (
 	"log"
@@ -55,7 +55,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func main() {
+func ExamplePool() {
 	factory := func() *pool.Engine {
 		return pool.NewEngine(0)
 	}
