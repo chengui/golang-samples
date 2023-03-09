@@ -50,7 +50,7 @@ func (r result) String() string {
 }
 
 func Main(w io.Writer, args []string) error {
-	flagSet := flag.NewFlagSet("wc", flag.ExitOnError)
+	flagSet := flag.NewFlagSet("wc", flag.PanicOnError)
 	flagSet.BoolVar(&opt.helpFlag, "help", false, "show this message.")
 	flagSet.BoolVar(&opt.lineFlag, "l", false, "The number of lines")
 	flagSet.BoolVar(&opt.wordFlag, "w", false, "The number of words")

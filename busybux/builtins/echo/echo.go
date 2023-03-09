@@ -11,7 +11,7 @@ var helpFlag bool
 var newlineFlag bool
 
 func Main(w io.Writer, args []string) error {
-	flagSet := flag.NewFlagSet("echo", flag.ExitOnError)
+	flagSet := flag.NewFlagSet("echo", flag.PanicOnError)
 	flagSet.BoolVar(&helpFlag, "help", false, "Show this message.")
 	flagSet.BoolVar(&newlineFlag, "n", false, "Do not print the trailing newline character.")
 	flagSet.Parse(args)

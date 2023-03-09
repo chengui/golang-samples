@@ -12,7 +12,7 @@ var helpFlag bool
 var numberFlag bool
 
 func Main(w io.Writer, args []string) error {
-	flagSet := flag.NewFlagSet("cat", flag.ExitOnError)
+	flagSet := flag.NewFlagSet("cat", flag.PanicOnError)
 	flagSet.BoolVar(&helpFlag, "help", false, "Show this message.")
 	flagSet.BoolVar(&numberFlag, "n", false, "Number the output lines, starting at 1.")
 	flagSet.Parse(args)
