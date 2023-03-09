@@ -5,34 +5,43 @@ import (
 	"busybux/builtins"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"strings"
 )
 
 type Shell struct {
+	Stdin  io.Reader
+	Stdout io.Writer
+	Stderr io.Writer
 	Prompt string
 }
 
 func NewShell() *Shell {
-	return &Shell{Prompt: "%"}
+	return &Shell{
+		Stdin:  os.Stdin,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+		Prompt: "%",
+	}
 }
 
-func (sh *Shell) Exec(w io.Writer, f builtins.Handler, name string, args []string) error {
+func (sh *Shell) Exec(f builtins.Handler, name string, args []string) error {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Fprintf(w, "sh: %v\n", err)
+			fmt.Fprintf(sh.Stderr, "%s: %v\n", name, err)
 		}
 	}()
-	if err := f(w, args); err != nil {
-		fmt.Fprintf(w, "sh: %v\n", err)
+	if err := f(sh.Stdout, args); err != nil {
+		return err
 	}
 	return nil
 }
 
-func (sh *Shell) Run(r io.Reader, w io.Writer) {
-	sc := bufio.NewScanner(r)
+func (sh *Shell) Run() {
+	sc := bufio.NewScanner(sh.Stdin)
 	for {
-		fmt.Fprintf(w, "%s ", sh.Prompt)
+		fmt.Fprintf(sh.Stdout, "%s ", sh.Prompt)
 		if !sc.Scan() {
 			break
 		}
@@ -42,14 +51,14 @@ func (sh *Shell) Run(r io.Reader, w io.Writer) {
 		}
 		name, args := ss[0], ss[1:]
 		if f, ok := builtins.Commands[name]; ok {
-			if err := sh.Exec(w, f, name, args); err != nil {
-				fmt.Fprintf(w, "sh: %v\n", err)
+			if err := sh.Exec(f, name, args); err != nil {
+				fmt.Fprintf(sh.Stderr, "%s: %v\n", name, err)
 			}
 		} else {
 			cmd := exec.Command(name, args...)
-			cmd.Stdout, cmd.Stderr = w, w
+			cmd.Stdout, cmd.Stderr = sh.Stdout, sh.Stderr
 			if err := cmd.Run(); err != nil {
-				fmt.Fprintf(w, "sh: %v\n", err)
+				fmt.Fprintf(sh.Stderr, "%s: %v\n", name, err)
 			}
 		}
 	}
