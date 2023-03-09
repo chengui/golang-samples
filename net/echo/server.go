@@ -1,4 +1,4 @@
-package server
+package echo
 
 import (
 	"fmt"
@@ -34,7 +34,6 @@ func (s *EchoServer) Start() error {
 		}
 		go s.Handler(conn)
 	}
-	return nil
 }
 
 func (s *EchoServer) Handler(conn net.Conn) error {
@@ -56,5 +55,4 @@ func (s *EchoServer) Handler(conn net.Conn) error {
 		}
 		log.Printf("Reply %d bytes", nw)
 	}
-	return nil
 }

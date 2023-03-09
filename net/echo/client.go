@@ -1,4 +1,4 @@
-package client
+package echo
 
 import (
 	"bufio"
