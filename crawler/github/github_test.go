@@ -1,14 +1,13 @@
-package main
+package github
 
 import (
 	"flag"
 	"fmt"
-	"go-github/github"
 	"os"
 )
 
-func main() {
-	gh := github.New("chengui/zypp-garden")
+func Example() {
+	gh := New("chengui/zypp-garden")
 
 	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
 	searchFilter := searchCmd.String("filter", "", "search filter")
@@ -30,11 +29,6 @@ func main() {
 	closeCmd := flag.NewFlagSet("close", flag.ExitOnError)
 	closeId := closeCmd.Int("id", 0, "issue id")
 
-	if len(os.Args) < 2 {
-		flag.Usage()
-		os.Exit(1)
-	}
-
 	switch os.Args[1] {
 	case "search":
 		searchCmd.Parse(os.Args[2:])
@@ -50,7 +44,7 @@ func main() {
 		fmt.Println(issues)
 	case "create":
 		createCmd.Parse(os.Args[2:])
-		_, err := gh.CreateIssue(&github.NewIssue{
+		_, err := gh.CreateIssue(&NewIssue{
 			Title: *createTitle,
 			Body:  *createBody,
 		})
@@ -69,7 +63,7 @@ func main() {
 		fmt.Println(issue)
 	case "update":
 		updateCmd.Parse(os.Args[2:])
-		_, err := gh.UpdateIssue(*updateId, &github.NewIssue{
+		_, err := gh.UpdateIssue(*updateId, &NewIssue{
 			Title: *updateTitle,
 			Body:  *updateBody,
 		})

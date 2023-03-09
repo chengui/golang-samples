@@ -21,7 +21,7 @@ type SearchQuery struct {
 }
 
 const ApiURL = "https://api.github.com"
-const ApiToken = ""
+const ApiToken = "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"
 
 type Github struct {
 	IssueURL string
